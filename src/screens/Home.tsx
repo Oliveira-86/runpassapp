@@ -2,14 +2,13 @@ import {
   StyleSheet,
   Text,
   View,
-  Linking,
   SafeAreaView,
   TouchableOpacity,
   BackHandler,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
-import {useLinkTo} from '@react-navigation/native';
 import {WebView} from 'react-native-webview';
+import axios from 'axios';
 
 const Home = () => {
   const [webview, setWebview] = useState(false);
@@ -18,10 +17,10 @@ const Home = () => {
     setWebview(true);
   };
 
-  function handleBackButtonClick() {
+  const handleBackButtonClick = () => {
     setWebview(false);
     return true;
-  }
+  };
 
   useEffect(() => {
     BackHandler.addEventListener('hardwareBackPress', handleBackButtonClick);
@@ -32,6 +31,36 @@ const Home = () => {
       );
     };
   }, []);
+
+  const handleActivityApi = async () => {
+    try {
+      await axios.get(
+        `http://192.168.0.7:8000/garmin/user-activity-api?userId=${'d9de2632-1c42-438a-b161-d98980f22c00'}`,
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleHealDailiesApi = async () => {
+    try {
+      await axios.get(
+        `http://192.168.0.7:8000/garmin/user-health-api?userId=${'d9de2632-1c42-438a-b161-d98980f22c00'}&endpoint=${'dailies'}`,
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleHealDailiesBloodPressures = async () => {
+    try {
+      await axios.get(
+        `http://192.168.0.7:8000/garmin/user-health-api?userId=${'d9de2632-1c42-438a-b161-d98980f22c00'}&endpoint=${'bloodPressures'}`,
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -44,6 +73,21 @@ const Home = () => {
         <View style={styles.centered}>
           <TouchableOpacity style={styles.button} onPress={openWebview}>
             <Text style={styles.text}>Iniciar Autorização</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, {marginTop: 10}]}
+            onPress={handleActivityApi}>
+            <Text style={styles.text}>Activity API</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, {marginTop: 10}]}
+            onPress={handleHealDailiesApi}>
+            <Text style={styles.text}>Health Dailies</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.button, {marginTop: 10}]}
+            onPress={handleHealDailiesBloodPressures}>
+            <Text style={styles.text}>Health Blood Pressures</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -60,7 +104,7 @@ const styles = StyleSheet.create({
   centered: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    padding: 20,
   },
   button: {
     padding: 10,
